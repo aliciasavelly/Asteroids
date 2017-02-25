@@ -110,14 +110,14 @@ module.exports = Util;
 const Util = __webpack_require__(0);
 const MovingObject = __webpack_require__(2);
 
-BULLET = {
+B_DEFAULTS = {
   RADIUS: 5,
   COLOR: "#00d60a"
 }
 
 function Bullet(options) {
-  options.color = BULLET.COLOR;
-  options.radius = BULLET.RADIUS;
+  options.color = B_DEFAULTS.COLOR;
+  options.radius = B_DEFAULTS.RADIUS;
 
   MovingObject.call(this, options);
 }
@@ -183,7 +183,7 @@ const MovingObject = __webpack_require__(2);
 const Ship = __webpack_require__(5);
 const Bullet = __webpack_require__(1);
 
-const AST_DEFAULTS = {
+const A_DEFAULTS = {
   COLOR: "#4decf2",
   RADIUS: 10
 };
@@ -192,8 +192,8 @@ const NUM_TURNS = 5;
 let TURNS_TAKEN = 0;
 
 function Asteroid(options) {
-  options.color = AST_DEFAULTS.COLOR;
-  options.radius = AST_DEFAULTS.RADIUS;
+  options.color = A_DEFAULTS.COLOR;
+  options.radius = A_DEFAULTS.RADIUS;
   options.vel = Util.randomVec(5);
 
   MovingObject.call(this, options);
@@ -207,16 +207,15 @@ Asteroid.prototype.collideWith = function(otherObject) {
     if (TURNS_TAKEN >= NUM_TURNS) {
       this.game.remove(otherObject);
       alert('GAME OVER!! Refresh to try again!');
-      // otherObject.vel = [0, 0];
     } else {
       otherObject.relocate();
     }
   } else if (otherObject instanceof Bullet) {
     this.game.remove(otherObject);
     this.game.remove(this);
-  }
-  if (this.game.asteroids.length === 0) {
-    alert('YOU WIN!! Refresh to play again!');
+    if (this.game.asteroids.length === 0) {
+      alert('YOU WIN!! Refresh to play again!');
+    }
   }
 };
 
@@ -232,7 +231,8 @@ const Bullet = __webpack_require__(1);
 const Ship = __webpack_require__(5);
 const Util = __webpack_require__(0)
 
-function Game() {
+function Game(num_asteroids) {
+  this.num_asteroids = num_asteroids;
   this.asteroids = this.addAsteroids();
   this.bullets = [];
   new_ship = new Ship({ pos: this.randomPosition(), game: this });
@@ -242,7 +242,7 @@ function Game() {
 
 Game.DIM_X = window.innerWidth;
 Game.DIM_Y = window.innerHeight;
-Game.NUM_ASTEROIDS = 4;
+Game.NUM_ASTEROIDS = this.num_asteroids;
 
 Game.prototype.createImage = function() {
   const img = new Image();
@@ -254,9 +254,9 @@ Game.prototype.createImage = function() {
 
 Game.prototype.addAsteroids = function() {
   const asteroids = [];
-  for (let i = 0; i < Game.NUM_ASTEROIDS; i++) {
-    const a = new Asteroid({ pos: this.randomPosition(), game: this });
-    asteroids.push(a);
+  for (let i = 0; i < this.num_asteroids; i++) {
+    const asteroid = new Asteroid({ pos: this.randomPosition(), game: this });
+    asteroids.push(asteroid);
   }
   return asteroids;
 };
@@ -326,15 +326,15 @@ const MovingObject = __webpack_require__(2);
 const Util = __webpack_require__(0);
 const Bullet = __webpack_require__(1);
 
-DEFAULTS = {
+S_DEFAULTS = {
   RADIUS: 20,
   COLOR: "#e24a4a"
 }
 
 function Ship(options) {
-  options.radius = DEFAULTS.RADIUS;
+  options.radius = S_DEFAULTS.RADIUS;
   options.vel = [0, 0];
-  options.color = DEFAULTS.COLOR;
+  options.color = S_DEFAULTS.COLOR;
 
   MovingObject.call(this, options);
 }
@@ -381,7 +381,8 @@ module.exports = Ship;
 const Game = __webpack_require__(4);
 
 function GameView(ctx) {
-  this.game = new Game;
+  num_a = prompt("How many asteroids do you want to start with?");
+  this.game = new Game(num_a);
   this.ctx = ctx;
 }
 
