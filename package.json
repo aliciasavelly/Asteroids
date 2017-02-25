@@ -1,0 +1,23 @@
+{
+  "name": "asteroids",
+  "version": "1.0.0",
+  "description": "Asteroids game!",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aliciasavelly/Asteroids.git"
+  },
+  "author": "Alicia Savelly, Terry O'Shea",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aliciasavelly/Asteroids/issues"
+  },
+  "homepage": "https://github.com/aliciasavelly/Asteroids#readme",
+  "dependencies": {
+    "express": "^4.14.1",
+    "webpack": "^2.2.1"
+  }
+}
