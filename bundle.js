@@ -68,10 +68,47 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+const Util = {
+  inherits(ChildClass, ParentClass) {
+    ChildClass.prototype = Object.create(ParentClass.prototype);
+    ChildClass.prototype.constructor = ChildClass;
+  },
+
+  // Return a randomly oriented vector with the given length.
+  randomVec (length) {
+    const deg = 2 * Math.PI * Math.random();
+    return Util.scale([Math.sin(deg), Math.cos(deg)], length);
+  },
+
+  // Scale the length of a vector by the given amount.
+  scale (vec, m) {
+    return [vec[0] * m, vec[1] * m];
+  },
+
+  wrap (coord, max) {
+    if (coord < 0) {
+      return max - (coord % max);
+    } else if (coord > max) {
+      return coord % max;
+    } else {
+      return coord;
+    }
+  }
+
+};
+
+
+module.exports = Util;
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const Util = __webpack_require__(2);
-const MovingObject = __webpack_require__(1);
+const Util = __webpack_require__(0);
+const MovingObject = __webpack_require__(2);
 
 BULLET = {
   RADIUS: 5,
@@ -93,7 +130,7 @@ module.exports = Bullet;
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports) {
 
 function MovingObject(options, game) {
@@ -138,40 +175,13 @@ module.exports = MovingObject;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-const Util = {
-  inherits(ChildClass, ParentClass) {
-    ChildClass.prototype = Object.create(ParentClass.prototype);
-    ChildClass.prototype.constructor = ChildClass;
-  },
-
-  // Return a randomly oriented vector with the given length.
-  randomVec (length) {
-    const deg = 2 * Math.PI * Math.random();
-    return Util.scale([Math.sin(deg), Math.cos(deg)], length);
-  },
-
-  // Scale the length of a vector by the given amount.
-  scale (vec, m) {
-    return [vec[0] * m, vec[1] * m];
-  }
-
-};
-
-
-module.exports = Util;
-
-
-/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const Util = __webpack_require__(2);
-const MovingObject = __webpack_require__(1);
+const Util = __webpack_require__(0);
+const MovingObject = __webpack_require__(2);
 const Ship = __webpack_require__(5);
-const Bullet = __webpack_require__(0);
+const Bullet = __webpack_require__(1);
 
 const AST_DEFAULTS = {
   COLOR: "#4decf2",
@@ -205,6 +215,9 @@ Asteroid.prototype.collideWith = function(otherObject) {
     this.game.remove(otherObject);
     this.game.remove(this);
   }
+  if (this.game.asteroids.length === 0) {
+    alert('YOU WIN!! Refresh to play again!');
+  }
 };
 
 module.exports = Asteroid;
@@ -215,9 +228,9 @@ module.exports = Asteroid;
 /***/ (function(module, exports, __webpack_require__) {
 
 const Asteroid = __webpack_require__(3);
-const Bullet = __webpack_require__(0);
+const Bullet = __webpack_require__(1);
 const Ship = __webpack_require__(5);
-const Util = __webpack_require__(2)
+const Util = __webpack_require__(0)
 
 function Game() {
   this.asteroids = this.addAsteroids();
@@ -229,7 +242,7 @@ function Game() {
 
 Game.DIM_X = window.innerWidth;
 Game.DIM_Y = window.innerHeight;
-Game.NUM_ASTEROIDS = 8;
+Game.NUM_ASTEROIDS = 4;
 
 Game.prototype.createImage = function() {
   const img = new Image();
@@ -263,13 +276,9 @@ Game.prototype.moveObjects = function() {
 };
 
 Game.prototype.wrap = function(pos) {
-  const pos2 = [...pos];
-  if (pos2[0] <= 0) { pos2[0] = Game.DIM_X; }
-  else if (pos2[0] >= Game.DIM_X) { pos2[0] = 0; }
-
-  if (pos2[1] <= 0) { pos2[1] = Game.DIM_Y; }
-  else if (pos2[1] >= Game.DIM_Y) { pos2[1] = 0; }
-  return pos2;
+  return [
+    Util.wrap(pos[0], Game.DIM_X), Util.wrap(pos[1], Game.DIM_Y)
+  ];
 };
 
 Game.prototype.checkCollisions = function() {
@@ -313,9 +322,9 @@ module.exports = Game;
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const MovingObject = __webpack_require__(1);
-const Util = __webpack_require__(2);
-const Bullet = __webpack_require__(0);
+const MovingObject = __webpack_require__(2);
+const Util = __webpack_require__(0);
+const Bullet = __webpack_require__(1);
 
 DEFAULTS = {
   RADIUS: 20,
@@ -346,13 +355,13 @@ Ship.prototype.power = function(impulse) {
 };
 
 Ship.prototype.maintainVel = function(coord) {
-  if (this.vel[coord] < -9) {this.vel[coord] = -9}
-  if (this.vel[coord] > 9) {this.vel[coord] = 9}
+  if (this.vel[coord] < -8) {this.vel[coord] = -8}
+  if (this.vel[coord] > 8) {this.vel[coord] = 8}
 };
 
 Ship.prototype.fireBullet = function() {
   const bullet_velocity = [this.vel[0] * 4, this.vel[1] * 4];
-  
+
   if (this.vel[0] === 0 && this.vel[1] === 0) {
     bullet_velocity[0] = 3;
     bullet_velocity[1] = 3;
