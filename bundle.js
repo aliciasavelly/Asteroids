@@ -242,7 +242,6 @@ function Game(num_asteroids) {
 
 Game.DIM_X = window.innerWidth;
 Game.DIM_Y = window.innerHeight;
-Game.NUM_ASTEROIDS = this.num_asteroids;
 
 Game.prototype.createImage = function() {
   const img = new Image();
@@ -258,6 +257,7 @@ Game.prototype.addAsteroids = function() {
     const asteroid = new Asteroid({ pos: this.randomPosition(), game: this });
     asteroids.push(asteroid);
   }
+
   return asteroids;
 };
 
@@ -283,6 +283,7 @@ Game.prototype.wrap = function(pos) {
 
 Game.prototype.checkCollisions = function() {
   const objects = this.allObjects();
+  
   for (let i = 0; i < objects.length - 1; i++) {
     for (let j = i + 1; j < objects.length; j++) {
       if (objects[i].isCollidedWith(objects[j])) {
@@ -343,7 +344,6 @@ Util.inherits(Ship, MovingObject);
 
 Ship.prototype.relocate = function() {
   this.pos = this.game.randomPosition();
-  // this.vel = [0, 0];
 };
 
 Ship.prototype.power = function(impulse) {
@@ -365,6 +365,15 @@ Ship.prototype.fireBullet = function() {
   if (this.vel[0] === 0 && this.vel[1] === 0) {
     bullet_velocity[0] = 3;
     bullet_velocity[1] = 3;
+    
+    if (Math.random() < .5) {
+      bullet_velocity[0] *= -1;
+      if (Math.random() > .5) {
+        bullet_velocity[1] *= -1;
+      }
+    } else if (Math.random() < .5) {
+      bullet_velocity[1] *= -1;
+    }
   }
 
   const b = new Bullet({pos: this.pos, vel: bullet_velocity, game: this.game});
